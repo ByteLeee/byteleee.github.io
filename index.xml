@@ -26,7 +26,7 @@
       <pubDate>Wed, 18 Dec 2019 21:55:00 +0800</pubDate>
       
       <guid>https://byteleee.github.io/2019/12/18/golang-gin-query-parameters-array-map.html</guid>
-      <description>什么是lambda表达式 看看lambda表达式在其他语言中怎么使用的： 在python中有lambda表达式，在python中可以使用它定义匿名方法，并赋值给一个变量，然后那个变量就成为了一个方法，比如 f = lambda x: (x + 1 ) if x &amp;gt; 100 else x - 1 # 相当于 def f(x): return (x + 1 ) if x &amp;gt; 100 else x - 1; 或者把la</description>
+      <description>什么是lambda表达式 看看lambda表达式在其他语言中怎么使用的： 在python中有lambda表达式，在python中可以使用它定义匿名方法，并赋值给一个变量，然后那个变量就成为了一个方法，比如 1 2 3 4 5 f = lambda x: (x + 1 ) if x &amp;gt; 100 else x - 1 # 相当于 def f(x): return (x + 1 ) if x &amp;gt; 100 else x - 1;</description>
     </item>
     
     <item>

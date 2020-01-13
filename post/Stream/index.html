@@ -31,9 +31,6 @@
 
     
     
-    <link href="https://cdn.bootcss.com/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
-    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
-    <script>hljs.initHighlightingOnLoad();</script>
     <style>
         code.has-jax {
             font: inherit;
@@ -99,75 +96,89 @@
         
         
         <div class="post-content">
-            
-
-<h1 id="stream">Stream</h1>
-
+            <h1 id="stream">Stream</h1>
 <p>[toc]</p>
-
 <h2 id="0-前置知识点">0. 前置知识点</h2>
-
 <ul>
 <li>函数式接口</li>
-
-<li><p>lambda表达式和方法引用传递</p>
-
+<li>lambda表达式和方法引用传递</li>
+</ul>
 <h2 id="1-概述">1. 概述</h2>
-
 <p>Stream API提供一种”函数式风格的、声明式的“处理数据集合的方式，使用Stream API，可以使得集合处理更加易读（声明式的特征），甚至更加高效（内置的并发处理的特性）。</p>
-
-<h2 id="2-命令式和函数式极简对比">2.命令式和函数式极简对比</h2>
-
+<h2 id="2命令式和函数式极简对比">2.命令式和函数式极简对比</h2>
 <blockquote>
 <p>对1到n(n&gt;1)的自然数求和，命令式和函数式是如何实现的。</p>
-</blockquote></li>
-
-<li><p>命令式（Java实现为例）</p>
-
-<pre><code class="language-java">public int sum(int n){
-int sum = 0;
-for (int i = 1; i &lt;= n; i++) {
-    sum+=i;
-}
-return  sum;
-}
-</code></pre></li>
-
-<li><p>函数式（Haskell实现为例）</p>
-
-<pre><code class="language-hs">sumN::Int -&gt; Int
-sumN 0 = 0
-sumN x = x + sumN (x-1)
-</code></pre>
-
-<p>再看一下函数式的解决方法脱离语法，是不是接近以下的函数定义：
+</blockquote>
+<ul>
+<li>命令式（Java实现为例）</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#000;font-weight:bold">public</span> <span style="color:#458;font-weight:bold">int</span> <span style="color:#900;font-weight:bold">sum</span><span style="color:#000;font-weight:bold">(</span><span style="color:#458;font-weight:bold">int</span> n<span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">{</span>
+    <span style="color:#458;font-weight:bold">int</span> sum <span style="color:#000;font-weight:bold">=</span> 0<span style="color:#000;font-weight:bold">;</span>
+    <span style="color:#000;font-weight:bold">for</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#458;font-weight:bold">int</span> i <span style="color:#000;font-weight:bold">=</span> 1<span style="color:#000;font-weight:bold">;</span> i <span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000;font-weight:bold">=</span> n<span style="color:#000;font-weight:bold">;</span> i<span style="color:#000;font-weight:bold">+</span><span style="color:#000;font-weight:bold">+</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">{</span>
+        sum<span style="color:#000;font-weight:bold">+</span><span style="color:#000;font-weight:bold">=</span>i<span style="color:#000;font-weight:bold">;</span>
+    <span style="color:#000;font-weight:bold">}</span>
+    <span style="color:#000;font-weight:bold">return</span>  sum<span style="color:#000;font-weight:bold">;</span>
+<span style="color:#000;font-weight:bold">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>函数式（Haskell实现为例）</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-hs" data-lang="hs"><span style="color:#900;font-weight:bold">sumN</span><span style="color:#000;font-weight:bold">::</span><span style="color:#458;font-weight:bold">Int</span> <span style="color:#000;font-weight:bold">-&gt;</span> <span style="color:#458;font-weight:bold">Int</span>
+<span style="color:#900;font-weight:bold">sumN</span> <span style="color:#099">0</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">0</span>
+<span style="color:#900;font-weight:bold">sumN</span> x <span style="color:#000;font-weight:bold">=</span> x <span style="color:#000;font-weight:bold">+</span> sumN (x<span style="color:#000;font-weight:bold">-</span><span style="color:#099">1</span>)
+</code></pre></td></tr></table>
+</div>
+</div><p>再看一下函数式的解决方法脱离语法，是不是接近以下的函数定义：
 $$
 f(x) = \begin{cases}
 0 &amp;\text{if } (x \leq 0)
-<br />
+\<br>
 x + f( x-1 ) &amp;\text{if } (x &gt;0)
 \end{cases}
-$$</p></li>
-</ul>
-
+$$</p>
 <p>函数式的定义在描述问题，命令式则是在描述一步一步解决问题。</p>
-
-<h2 id="3-unix管道和流处理">3.Unix管道和流处理</h2>
-
+<h2 id="3unix管道和流处理">3.Unix管道和流处理</h2>
 <p>为什么要提到Unix的管道呢，因为从他们的工作流程上看，他们太像了。接触过Linux命令的同学应该很熟悉类似以下的这种命令组合<code>cat tmp.txt | grep 'test' | sed xx | tail -n 1</code>,其中的<code>|</code>就是管道操作符，它的作用就是将多个应用在”标准输出流”上的操作组合起来，类似一个流水线的处理，针对同一个物品，一步一步加工，最后返回成品。Stream API也有这种特性，看一段实例代码感受一下：</p>
-
-<pre><code class="language-java">List&lt;Integer&gt; collect = Stream.of(10, 1, 2, 3, 4, 5, 6, 6, 7, 10, 2)
-        .filter(x -&gt; x % 2 == 0)
-        .distinct()
-        .sorted()
-        .collect(Collectors.toList());
-</code></pre>
-
-<p>这段代码就很有“声明式”的味道了，有点英文基础的，就能明白这段代码是将一串数字中的偶数去重再排序。
-&gt; 如果不使用Stream API，要完成这种操作，该如何编写代码呢？</p>
-
-<h2 id="4-stream中的几个概念">4.Stream中的几个概念</h2>
-
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">List<span style="color:#000;font-weight:bold">&lt;</span>Integer<span style="color:#000;font-weight:bold">&gt;</span> collect <span style="color:#000;font-weight:bold">=</span> Stream<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">of</span><span style="color:#000;font-weight:bold">(</span>10<span style="color:#000;font-weight:bold">,</span> 1<span style="color:#000;font-weight:bold">,</span> 2<span style="color:#000;font-weight:bold">,</span> 3<span style="color:#000;font-weight:bold">,</span> 4<span style="color:#000;font-weight:bold">,</span> 5<span style="color:#000;font-weight:bold">,</span> 6<span style="color:#000;font-weight:bold">,</span> 6<span style="color:#000;font-weight:bold">,</span> 7<span style="color:#000;font-weight:bold">,</span> 10<span style="color:#000;font-weight:bold">,</span> 2<span style="color:#000;font-weight:bold">)</span>
+        <span style="color:#000;font-weight:bold">.</span><span style="color:#008080">filter</span><span style="color:#000;font-weight:bold">(</span>x <span style="color:#000;font-weight:bold">-</span><span style="color:#000;font-weight:bold">&gt;</span> x <span style="color:#000;font-weight:bold">%</span> 2 <span style="color:#000;font-weight:bold">=</span><span style="color:#000;font-weight:bold">=</span> 0<span style="color:#000;font-weight:bold">)</span>
+        <span style="color:#000;font-weight:bold">.</span><span style="color:#008080">distinct</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span>
+        <span style="color:#000;font-weight:bold">.</span><span style="color:#008080">sorted</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span>
+        <span style="color:#000;font-weight:bold">.</span><span style="color:#008080">collect</span><span style="color:#000;font-weight:bold">(</span>Collectors<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">toList</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>这段代码就很有“声明式”的味道了，有点英文基础的，就能明白这段代码是将一串数字中的偶数去重再排序。</p>
+<blockquote>
+<p>如果不使用Stream API，要完成这种操作，该如何编写代码呢？</p>
+</blockquote>
+<h2 id="4stream中的几个概念">4.Stream中的几个概念</h2>
 <ol>
 <li>中间操作和终结操作
 想象一个流水线，上面的商品经过各种贴标签、注入内容、盖上盖子等机械臂，是不是依然在流水线上徘徊，这种处理前后不改变其所在“位置”的操作，也就是能继续处理的操作，就是中间操作。回到流中就是处理后流还是流，能继续施加流的api。那么终结操作就更好理解了，处于流水线的最后了，收集、打包…使其终结流水线生涯，就是终结操作。回到流中就是归约（比如求和等数学运算取最终结果、取某一个值等等）、收集（收集到容器中供后续使用）等操作，简而言之就是流处理到此为止该看结果了。</li>
@@ -176,280 +187,495 @@ $$</p></li>
 <li>并行操作
 Stream提供parallelStream来实现并行处理。</li>
 </ol>
-
-<h2 id="5-函数式编程的几个概念">5.函数式编程的几个概念</h2>
-
-<p>函数式编程（FP）是和面向对象（OOP）不同的编程范式，因为Stream API实际上借鉴的是函数式的思想，在此列出几个概念。
-1. 函数，函数式编程世界中，一级公民是函数，怎么理解，OOP到处是对象，FP则处处是函数，函数可以像OOP的对象一样传给函数，Stream API站在lambda表达式的肩膀上，实现了接近传递函数的语义。
-2. 无状态，FP中只要定义了变量，一旦赋值就是不可变的，所以没有传递引用的语义，不存在一个对象在一个链路中从头到尾千变万化最后亲妈都认不出来。
-3. 惰性计算，这是FP非常重要的特征，所谓惰性计算，就是不到实际要计算的时候，是不会执行的。上面的示例 代码，filter、distinct、sorted这些，并不是对数据遍历了三遍做处理，而是在需要最后collect的时候 ，才真正触发了这些 “函数”。</p>
-
-<h2 id="6-stream-api入门">6.Stream API入门</h2>
-
-<h3 id="6-1流水线第一步-生成流">6.1流水线第一步—生成流</h3>
-
+<h2 id="5函数式编程的几个概念">5.函数式编程的几个概念</h2>
+<p>函数式编程（FP）是和面向对象（OOP）不同的编程范式，因为Stream API实际上借鉴的是函数式的思想，在此列出几个概念。</p>
+<ol>
+<li>函数，函数式编程世界中，一级公民是函数，怎么理解，OOP到处是对象，FP则处处是函数，函数可以像OOP的对象一样传给函数，Stream API站在lambda表达式的肩膀上，实现了接近传递函数的语义。</li>
+<li>无状态，FP中只要定义了变量，一旦赋值就是不可变的，所以没有传递引用的语义，不存在一个对象在一个链路中从头到尾千变万化最后亲妈都认不出来。</li>
+<li>惰性计算，这是FP非常重要的特征，所谓惰性计算，就是不到实际要计算的时候，是不会执行的。上面的示例 代码，filter、distinct、sorted这些，并不是对数据遍历了三遍做处理，而是在需要最后collect的时候 ，才真正触发了这些 “函数”。</li>
+</ol>
+<h2 id="6stream-api入门">6.Stream API入门</h2>
+<h3 id="61流水线第一步生成流">6.1流水线第一步—生成流</h3>
 <ul>
 <li>从集合对象生成流，一般是使用<code>&lt;Collection&gt;.stream()</code>就可以得到流对象，这是最为常用的方式</li>
 <li>使用<code>Stream.of()</code>封装</li>
 <li>使用<code>Stream.generate()</code>生成流 （无限流）</li>
 </ul>
-
-<p><img src="evernotecid://3944D88F-A777-4897-BA93-E849C9DFE7EB/appyinxiangcom/6957898/ENResource/p2086" alt="dddf50a0f65071fb9d054f3325f80188.png" /></p>
-
+<p><img src="evernotecid://3944D88F-A777-4897-BA93-E849C9DFE7EB/appyinxiangcom/6957898/ENResource/p2086" alt="dddf50a0f65071fb9d054f3325f80188.png"></p>
 <p>示例：</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">35
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">36
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">37
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">38
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">39
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">40
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">41
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">42
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">43
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">44
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">45
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">46
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">47
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">48
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">49
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">50
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">51
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">52
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">53
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">54
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">55
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">56
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">57
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">58
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">59
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">60
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">61
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">62
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">63
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">64
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">65
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">66
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">67
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">68
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">69
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">70
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">71
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">72
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">73
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">74
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#000;font-weight:bold">public</span> <span style="color:#000;font-weight:bold">class</span> <span style="color:#458;font-weight:bold">生成流</span> <span style="color:#000;font-weight:bold">{</span>
 
-<pre><code class="language-java">public class 生成流 {
+    <span style="color:#998;font-style:italic">/**
+</span><span style="color:#998;font-style:italic">     * date:2019/12/18 11:00 PM
+</span><span style="color:#998;font-style:italic">     */</span>
+    <span style="color:#3c5d5d;font-weight:bold">@Test</span>
+    <span style="color:#000;font-weight:bold">public</span> <span style="color:#458;font-weight:bold">void</span> <span style="color:#900;font-weight:bold">testOf</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">{</span>
+        Stream<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">of</span><span style="color:#000;font-weight:bold">(</span>1<span style="color:#000;font-weight:bold">,</span> 2<span style="color:#000;font-weight:bold">,</span> 3<span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">;</span>
+        Stream<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">of</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">new</span> <span style="color:#458;font-weight:bold">int</span><span style="color:#000;font-weight:bold">[</span><span style="color:#000;font-weight:bold">]</span><span style="color:#000;font-weight:bold">{</span>1<span style="color:#000;font-weight:bold">,</span> 2<span style="color:#000;font-weight:bold">,</span> 3<span style="color:#000;font-weight:bold">}</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">;</span>
+    <span style="color:#000;font-weight:bold">}</span>
 
-    /**
-     * date:2019/12/18 11:00 PM
-     */
-    @Test
-    public void testOf() {
-        Stream.of(1, 2, 3);
-        Stream.of(new int[]{1, 2, 3});
-    }
+    <span style="color:#998;font-style:italic">/**
+</span><span style="color:#998;font-style:italic">     * 生成无限流
+</span><span style="color:#998;font-style:italic">     * date:2019/12/18 11:01 PM
+</span><span style="color:#998;font-style:italic">     */</span>
+    <span style="color:#3c5d5d;font-weight:bold">@Test</span>
+    <span style="color:#000;font-weight:bold">public</span> <span style="color:#458;font-weight:bold">void</span> <span style="color:#900;font-weight:bold">testGenerate</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">{</span>
+        AtomicInteger i <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">new</span> AtomicInteger<span style="color:#000;font-weight:bold">(</span>0<span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">;</span>
+        Stream<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">generate</span><span style="color:#000;font-weight:bold">(</span>i<span style="color:#000;font-weight:bold">:</span><span style="color:#000;font-weight:bold">:</span>incrementAndGet<span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">;</span>
 
-    /**
-     * 生成无限流
-     * date:2019/12/18 11:01 PM
-     */
-    @Test
-    public void testGenerate() {
-        AtomicInteger i = new AtomicInteger(0);
-        Stream.generate(i::incrementAndGet);
+    <span style="color:#000;font-weight:bold">}</span>
 
-    }
+    <span style="color:#998;font-style:italic">/**
+</span><span style="color:#998;font-style:italic">     * 生成无限流
+</span><span style="color:#998;font-style:italic">     * date:2019/12/18 11:01 PM
+</span><span style="color:#998;font-style:italic">     */</span>
+    <span style="color:#3c5d5d;font-weight:bold">@Test</span>
+    <span style="color:#000;font-weight:bold">public</span> <span style="color:#458;font-weight:bold">void</span> <span style="color:#900;font-weight:bold">testIterate</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">{</span>
+        Stream<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">iterate</span><span style="color:#000;font-weight:bold">(</span>1<span style="color:#000;font-weight:bold">,</span> x <span style="color:#000;font-weight:bold">-</span><span style="color:#000;font-weight:bold">&gt;</span> x <span style="color:#000;font-weight:bold">+</span> 2<span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">;</span>
+    <span style="color:#000;font-weight:bold">}</span>
 
-    /**
-     * 生成无限流
-     * date:2019/12/18 11:01 PM
-     */
-    @Test
-    public void testIterate() {
-        Stream.iterate(1, x -&gt; x + 2);
-    }
+    <span style="color:#998;font-style:italic">/**
+</span><span style="color:#998;font-style:italic">     * date:2019/12/18 11:05 PM
+</span><span style="color:#998;font-style:italic">     */</span>
+    <span style="color:#3c5d5d;font-weight:bold">@Test</span>
+    <span style="color:#000;font-weight:bold">public</span> <span style="color:#458;font-weight:bold">void</span> <span style="color:#900;font-weight:bold">testFromCollections</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">{</span>
+        Lists<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">newArrayList</span><span style="color:#000;font-weight:bold">(</span>1<span style="color:#000;font-weight:bold">,</span> 2<span style="color:#000;font-weight:bold">,</span> 4<span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">.</span><span style="color:#008080">stream</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">;</span>
+        Sets<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">newHashSet</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">.</span><span style="color:#008080">stream</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">;</span>
+        Maps<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">newHashMap</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">.</span><span style="color:#008080">entrySet</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">.</span><span style="color:#008080">stream</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">;</span>
+        Arrays<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">stream</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">new</span> <span style="color:#458;font-weight:bold">int</span><span style="color:#000;font-weight:bold">[</span><span style="color:#000;font-weight:bold">]</span><span style="color:#000;font-weight:bold">{</span>1<span style="color:#000;font-weight:bold">,</span> 2<span style="color:#000;font-weight:bold">,</span> 3<span style="color:#000;font-weight:bold">}</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">;</span>
+    <span style="color:#000;font-weight:bold">}</span>
 
-    /**
-     * date:2019/12/18 11:05 PM
-     */
-    @Test
-    public void testFromCollections() {
-        Lists.newArrayList(1, 2, 4).stream();
-        Sets.newHashSet().stream();
-        Maps.newHashMap().entrySet().stream();
-        Arrays.stream(new int[]{1, 2, 3});
-    }
+    <span style="color:#998;font-style:italic">/**
+</span><span style="color:#998;font-style:italic">     * date:2019/12/18 11:03 PM
+</span><span style="color:#998;font-style:italic">     */</span>
+    <span style="color:#3c5d5d;font-weight:bold">@Test</span>
+    <span style="color:#000;font-weight:bold">public</span> <span style="color:#458;font-weight:bold">void</span> <span style="color:#900;font-weight:bold">testFromFileReader</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">{</span>
 
-    /**
-     * date:2019/12/18 11:03 PM
-     */
-    @Test
-    public void testFromFileReader() {
+        <span style="color:#000;font-weight:bold">try</span> <span style="color:#000;font-weight:bold">{</span>
+            Stream<span style="color:#000;font-weight:bold">&lt;</span>String<span style="color:#000;font-weight:bold">&gt;</span> lines <span style="color:#000;font-weight:bold">=</span> Files<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">newBufferedReader</span><span style="color:#000;font-weight:bold">(</span>Paths<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">get</span><span style="color:#000;font-weight:bold">(</span><span style="color:#d14">&#34;/tmp/test.txt&#34;</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">.</span><span style="color:#008080">lines</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">;</span>
+        <span style="color:#000;font-weight:bold">}</span> <span style="color:#000;font-weight:bold">catch</span> <span style="color:#000;font-weight:bold">(</span>IOException e<span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">{</span>
+            e<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">printStackTrace</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">;</span>
+        <span style="color:#000;font-weight:bold">}</span>
 
-        try {
-            Stream&lt;String&gt; lines = Files.newBufferedReader(Paths.get(&quot;/tmp/test.txt&quot;)).lines();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    <span style="color:#000;font-weight:bold">}</span>
 
-    }
+    <span style="color:#998;font-style:italic">/**
+</span><span style="color:#998;font-style:italic">     * date:2019/12/18 11:07 PM
+</span><span style="color:#998;font-style:italic">     */</span>
+    <span style="color:#3c5d5d;font-weight:bold">@Test</span>
+    <span style="color:#000;font-weight:bold">public</span> <span style="color:#458;font-weight:bold">void</span> <span style="color:#900;font-weight:bold">testStreamBuilder</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">{</span>
+        IntStream intStream <span style="color:#000;font-weight:bold">=</span> IntStream<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">builder</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">.</span><span style="color:#008080">add</span><span style="color:#000;font-weight:bold">(</span>1<span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">.</span><span style="color:#008080">add</span><span style="color:#000;font-weight:bold">(</span>2<span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">.</span><span style="color:#008080">add</span><span style="color:#000;font-weight:bold">(</span>3<span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">.</span><span style="color:#008080">build</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">;</span>
 
-    /**
-     * date:2019/12/18 11:07 PM
-     */
-    @Test
-    public void testStreamBuilder() {
-        IntStream intStream = IntStream.builder().add(1).add(2).add(3).build();
+    <span style="color:#000;font-weight:bold">}</span>
 
-    }
+    <span style="color:#998;font-style:italic">/**
+</span><span style="color:#998;font-style:italic">     */</span>
+    <span style="color:#3c5d5d;font-weight:bold">@Test</span>
+    <span style="color:#000;font-weight:bold">public</span> <span style="color:#458;font-weight:bold">void</span> <span style="color:#900;font-weight:bold">testEmpty</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">{</span>
+        Stream<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">empty</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">;</span>
+    <span style="color:#000;font-weight:bold">}</span>
 
-    /**
-     */
-    @Test
-    public void testEmpty() {
-        Stream.empty();
-    }
+<span style="color:#000;font-weight:bold">}</span>
 
-}
-
-</code></pre>
-
-<h3 id="6-2流水线第二步-操作流">6.2流水线第二步—操作流</h3>
-
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="62流水线第二步操作流">6.2流水线第二步—操作流</h3>
 <ol>
 <li>中间操作（intermediate operation）
 是施加操作到流上后流依旧是流，可以叠加中间操作。常见的中间操作有：</li>
+</ol>
+<ul>
 <li>谓词（filter即过滤）</li>
 <li>映射（map）</li>
 <li>去重（distinct）</li>
 <li>排序（sort）</li>
-
-<li><p>扁平化（flatMap）
-<img src="evernotecid://3944D88F-A777-4897-BA93-E849C9DFE7EB/appyinxiangcom/6957898/ENResource/p2087" alt="f327c65e971c9b21acdf1c948974764d.png" /></p></li>
-
-<li><p>终结操作（terminal operation）
+<li>扁平化（flatMap）
+<img src="evernotecid://3944D88F-A777-4897-BA93-E849C9DFE7EB/appyinxiangcom/6957898/ENResource/p2087" alt="f327c65e971c9b21acdf1c948974764d.png"></li>
+</ul>
+<ol start="2">
+<li>终结操作（terminal operation）
 终结操作施加在流上就会使流结束，也就是不会再返回Stream对象了，终结操作是使用流的最终目的，不然流水线 永远不产生最终的产品，流水线是没有价值的。
-终结操作一般有：</p></li>
-
-<li><p>收集（collect，findFirst，findAny）</p></li>
-
-<li><p>归约（reduce）实际上sum(),count()，min(),max()等这些终结操作都只是reduce的具体实现。</p></li>
-
-<li><p>foreach（这个其实可以看做流的可迭代的特性了，不过此方法也会将流终结）
-<img src="evernotecid://3944D88F-A777-4897-BA93-E849C9DFE7EB/appyinxiangcom/6957898/ENResource/p2088" alt="4bdcd0e6fc76f8ab741c11286e251423.png" /></p></li>
+终结操作一般有：</li>
 </ol>
-
+<ul>
+<li>收集（collect，findFirst，findAny）</li>
+<li>归约（reduce）实际上sum(),count()，min(),max()等这些终结操作都只是reduce的具体实现。</li>
+<li>foreach（这个其实可以看做流的可迭代的特性了，不过此方法也会将流终结）
+<img src="evernotecid://3944D88F-A777-4897-BA93-E849C9DFE7EB/appyinxiangcom/6957898/ENResource/p2088" alt="4bdcd0e6fc76f8ab741c11286e251423.png"></li>
+</ul>
 <p>示例：</p>
-
-<pre><code class="language-java">public class 操作流 {
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">  1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">  2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">  3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">  4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">  5
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">  6
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">  7
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">  8
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">  9
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 10
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 11
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 12
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 13
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 14
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 15
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 16
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 17
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 18
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 19
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 20
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 21
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 22
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 23
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 24
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 25
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 26
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 27
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 28
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 29
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 30
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 31
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 32
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 33
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 34
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 35
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 36
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 37
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 38
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 39
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 40
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 41
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 42
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 43
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 44
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 45
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 46
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 47
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 48
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 49
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 50
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 51
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 52
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 53
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 54
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 55
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 56
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 57
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 58
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 59
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 60
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 61
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 62
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 63
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 64
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 65
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 66
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 67
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 68
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 69
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 70
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 71
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 72
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 73
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 74
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 75
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 76
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 77
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 78
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 79
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 80
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 81
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 82
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 83
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 84
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 85
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 86
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 87
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 88
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 89
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 90
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 91
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 92
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 93
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 94
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 95
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 96
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 97
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 98
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 99
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">100
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">101
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">102
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">103
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">104
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">105
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">106
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">107
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">108
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">109
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">110
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">111
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">112
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">113
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#000;font-weight:bold">public</span> <span style="color:#000;font-weight:bold">class</span> <span style="color:#458;font-weight:bold">操作流</span> <span style="color:#000;font-weight:bold">{</span>
  
 
-    /**
-     * 1-100中偶数求和
-     */
-    @Test
-    public void testStream() {
-        AtomicInteger i = new AtomicInteger(0);
-        List&lt;Integer&gt; integers = Stream.generate(i::incrementAndGet).limit(100).collect(Collectors.toList());
-        // 1-100中偶数求和
-        System.out.println(integers);
-        long count = integers.stream().filter(x -&gt; x % 2 == 0).reduce(0, (a, b) -&gt; a + b).longValue();
-        System.out.println(count);
-    }
+    <span style="color:#998;font-style:italic">/**
+</span><span style="color:#998;font-style:italic">     * 1-100中偶数求和
+</span><span style="color:#998;font-style:italic">     */</span>
+    <span style="color:#3c5d5d;font-weight:bold">@Test</span>
+    <span style="color:#000;font-weight:bold">public</span> <span style="color:#458;font-weight:bold">void</span> <span style="color:#900;font-weight:bold">testStream</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">{</span>
+        AtomicInteger i <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">new</span> AtomicInteger<span style="color:#000;font-weight:bold">(</span>0<span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">;</span>
+        List<span style="color:#000;font-weight:bold">&lt;</span>Integer<span style="color:#000;font-weight:bold">&gt;</span> integers <span style="color:#000;font-weight:bold">=</span> Stream<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">generate</span><span style="color:#000;font-weight:bold">(</span>i<span style="color:#000;font-weight:bold">:</span><span style="color:#000;font-weight:bold">:</span>incrementAndGet<span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">.</span><span style="color:#008080">limit</span><span style="color:#000;font-weight:bold">(</span>100<span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">.</span><span style="color:#008080">collect</span><span style="color:#000;font-weight:bold">(</span>Collectors<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">toList</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">;</span>
+        <span style="color:#998;font-style:italic">// 1-100中偶数求和
+</span><span style="color:#998;font-style:italic"></span>        System<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">out</span><span style="color:#000;font-weight:bold">.</span><span style="color:#008080">println</span><span style="color:#000;font-weight:bold">(</span>integers<span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">;</span>
+        <span style="color:#458;font-weight:bold">long</span> count <span style="color:#000;font-weight:bold">=</span> integers<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">stream</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">.</span><span style="color:#008080">filter</span><span style="color:#000;font-weight:bold">(</span>x <span style="color:#000;font-weight:bold">-</span><span style="color:#000;font-weight:bold">&gt;</span> x <span style="color:#000;font-weight:bold">%</span> 2 <span style="color:#000;font-weight:bold">=</span><span style="color:#000;font-weight:bold">=</span> 0<span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">.</span><span style="color:#008080">reduce</span><span style="color:#000;font-weight:bold">(</span>0<span style="color:#000;font-weight:bold">,</span> <span style="color:#000;font-weight:bold">(</span>a<span style="color:#000;font-weight:bold">,</span> b<span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">-</span><span style="color:#000;font-weight:bold">&gt;</span> a <span style="color:#000;font-weight:bold">+</span> b<span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">.</span><span style="color:#008080">longValue</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">;</span>
+        System<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">out</span><span style="color:#000;font-weight:bold">.</span><span style="color:#008080">println</span><span style="color:#000;font-weight:bold">(</span>count<span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">;</span>
+    <span style="color:#000;font-weight:bold">}</span>
 
-    /**
-     * 数据去重排序
-     * 12:13 PM
-     */
-    @Test
-    public void testSort() {
-        List&lt;Integer&gt; collect = Stream.of(10, 1, 2, 3, 4, 5, 6, 6, 7, 10, 2)
-                .filter(x -&gt; x % 2 == 0)
-                .distinct()
-                .sorted()
-                .collect(Collectors.toList());
-        System.out.println(collect);
-    }
+    <span style="color:#998;font-style:italic">/**
+</span><span style="color:#998;font-style:italic">     * 数据去重排序
+</span><span style="color:#998;font-style:italic">     * 12:13 PM
+</span><span style="color:#998;font-style:italic">     */</span>
+    <span style="color:#3c5d5d;font-weight:bold">@Test</span>
+    <span style="color:#000;font-weight:bold">public</span> <span style="color:#458;font-weight:bold">void</span> <span style="color:#900;font-weight:bold">testSort</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">{</span>
+        List<span style="color:#000;font-weight:bold">&lt;</span>Integer<span style="color:#000;font-weight:bold">&gt;</span> collect <span style="color:#000;font-weight:bold">=</span> Stream<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">of</span><span style="color:#000;font-weight:bold">(</span>10<span style="color:#000;font-weight:bold">,</span> 1<span style="color:#000;font-weight:bold">,</span> 2<span style="color:#000;font-weight:bold">,</span> 3<span style="color:#000;font-weight:bold">,</span> 4<span style="color:#000;font-weight:bold">,</span> 5<span style="color:#000;font-weight:bold">,</span> 6<span style="color:#000;font-weight:bold">,</span> 6<span style="color:#000;font-weight:bold">,</span> 7<span style="color:#000;font-weight:bold">,</span> 10<span style="color:#000;font-weight:bold">,</span> 2<span style="color:#000;font-weight:bold">)</span>
+                <span style="color:#000;font-weight:bold">.</span><span style="color:#008080">filter</span><span style="color:#000;font-weight:bold">(</span>x <span style="color:#000;font-weight:bold">-</span><span style="color:#000;font-weight:bold">&gt;</span> x <span style="color:#000;font-weight:bold">%</span> 2 <span style="color:#000;font-weight:bold">=</span><span style="color:#000;font-weight:bold">=</span> 0<span style="color:#000;font-weight:bold">)</span>
+                <span style="color:#000;font-weight:bold">.</span><span style="color:#008080">distinct</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span>
+                <span style="color:#000;font-weight:bold">.</span><span style="color:#008080">sorted</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span>
+                <span style="color:#000;font-weight:bold">.</span><span style="color:#008080">collect</span><span style="color:#000;font-weight:bold">(</span>Collectors<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">toList</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">;</span>
+        System<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">out</span><span style="color:#000;font-weight:bold">.</span><span style="color:#008080">println</span><span style="color:#000;font-weight:bold">(</span>collect<span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">;</span>
+    <span style="color:#000;font-weight:bold">}</span>
 
-    /**
-     * reduce相关
-     */
-    @Test
-    public void testReduce() {
-        Integer sum = IntStream.of(1, 2, 3).sum();
-        System.out.println(sum);
-        // 等价于
-        sum = Stream.of(1, 2, 3).reduce((a, b) -&gt; a + b).get();
-        System.out.println(sum);
-    }
+    <span style="color:#998;font-style:italic">/**
+</span><span style="color:#998;font-style:italic">     * reduce相关
+</span><span style="color:#998;font-style:italic">     */</span>
+    <span style="color:#3c5d5d;font-weight:bold">@Test</span>
+    <span style="color:#000;font-weight:bold">public</span> <span style="color:#458;font-weight:bold">void</span> <span style="color:#900;font-weight:bold">testReduce</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">{</span>
+        Integer sum <span style="color:#000;font-weight:bold">=</span> IntStream<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">of</span><span style="color:#000;font-weight:bold">(</span>1<span style="color:#000;font-weight:bold">,</span> 2<span style="color:#000;font-weight:bold">,</span> 3<span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">.</span><span style="color:#008080">sum</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">;</span>
+        System<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">out</span><span style="color:#000;font-weight:bold">.</span><span style="color:#008080">println</span><span style="color:#000;font-weight:bold">(</span>sum<span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">;</span>
+        <span style="color:#998;font-style:italic">// 等价于
+</span><span style="color:#998;font-style:italic"></span>        sum <span style="color:#000;font-weight:bold">=</span> Stream<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">of</span><span style="color:#000;font-weight:bold">(</span>1<span style="color:#000;font-weight:bold">,</span> 2<span style="color:#000;font-weight:bold">,</span> 3<span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">.</span><span style="color:#008080">reduce</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">(</span>a<span style="color:#000;font-weight:bold">,</span> b<span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">-</span><span style="color:#000;font-weight:bold">&gt;</span> a <span style="color:#000;font-weight:bold">+</span> b<span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">.</span><span style="color:#008080">get</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">;</span>
+        System<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">out</span><span style="color:#000;font-weight:bold">.</span><span style="color:#008080">println</span><span style="color:#000;font-weight:bold">(</span>sum<span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">;</span>
+    <span style="color:#000;font-weight:bold">}</span>
 
-    /**
-     * 数据映射 7:25 PM
-     */
-    @Test
-    public void testMap() {
-        String s = &quot;123,1234,1,1234,15&quot;;
-        int sum = Arrays.stream(s.split(&quot;,&quot;)).mapToInt(Integer::valueOf).sum();
-        System.out.println(sum);
-    }
+    <span style="color:#998;font-style:italic">/**
+</span><span style="color:#998;font-style:italic">     * 数据映射 7:25 PM
+</span><span style="color:#998;font-style:italic">     */</span>
+    <span style="color:#3c5d5d;font-weight:bold">@Test</span>
+    <span style="color:#000;font-weight:bold">public</span> <span style="color:#458;font-weight:bold">void</span> <span style="color:#900;font-weight:bold">testMap</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">{</span>
+        String s <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;123,1234,1,1234,15&#34;</span><span style="color:#000;font-weight:bold">;</span>
+        <span style="color:#458;font-weight:bold">int</span> sum <span style="color:#000;font-weight:bold">=</span> Arrays<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">stream</span><span style="color:#000;font-weight:bold">(</span>s<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">split</span><span style="color:#000;font-weight:bold">(</span><span style="color:#d14">&#34;,&#34;</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">.</span><span style="color:#008080">mapToInt</span><span style="color:#000;font-weight:bold">(</span>Integer<span style="color:#000;font-weight:bold">:</span><span style="color:#000;font-weight:bold">:</span>valueOf<span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">.</span><span style="color:#008080">sum</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">;</span>
+        System<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">out</span><span style="color:#000;font-weight:bold">.</span><span style="color:#008080">println</span><span style="color:#000;font-weight:bold">(</span>sum<span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">;</span>
+    <span style="color:#000;font-weight:bold">}</span>
 
-    /**
-     * 12:29 PM
-     * 类似mapToStream,将流中的每一个元素转换成stream,其实最后就是返回了一个Stream的Stream
-     */
-    @Test
-    public void testFlatMap() {
-        List&lt;String&gt; list = Arrays.asList(&quot;5.6&quot;, &quot;7.4&quot;, &quot;4&quot;,
-                &quot;1&quot;, &quot;2.3&quot;);
-        list.stream().flatMap(num -&gt; Stream.of(num)).
-                forEach(System.out::println);
-    }
+    <span style="color:#998;font-style:italic">/**
+</span><span style="color:#998;font-style:italic">     * 12:29 PM
+</span><span style="color:#998;font-style:italic">     * 类似mapToStream,将流中的每一个元素转换成stream,其实最后就是返回了一个Stream的Stream
+</span><span style="color:#998;font-style:italic">     */</span>
+    <span style="color:#3c5d5d;font-weight:bold">@Test</span>
+    <span style="color:#000;font-weight:bold">public</span> <span style="color:#458;font-weight:bold">void</span> <span style="color:#900;font-weight:bold">testFlatMap</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">{</span>
+        List<span style="color:#000;font-weight:bold">&lt;</span>String<span style="color:#000;font-weight:bold">&gt;</span> list <span style="color:#000;font-weight:bold">=</span> Arrays<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">asList</span><span style="color:#000;font-weight:bold">(</span><span style="color:#d14">&#34;5.6&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#d14">&#34;7.4&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#d14">&#34;4&#34;</span><span style="color:#000;font-weight:bold">,</span>
+                <span style="color:#d14">&#34;1&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#d14">&#34;2.3&#34;</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">;</span>
+        list<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">stream</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">.</span><span style="color:#008080">flatMap</span><span style="color:#000;font-weight:bold">(</span>num <span style="color:#000;font-weight:bold">-</span><span style="color:#000;font-weight:bold">&gt;</span> Stream<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">of</span><span style="color:#000;font-weight:bold">(</span>num<span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">.</span>
+                forEach<span style="color:#000;font-weight:bold">(</span>System<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">out</span><span style="color:#000;font-weight:bold">:</span><span style="color:#000;font-weight:bold">:</span>println<span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">;</span>
+    <span style="color:#000;font-weight:bold">}</span>
 
-    /**
-     * 扁平化list---&gt;降维
-     * date:2019/12/19 12:32 PM
-     */
-    @Test
-    public void testFlatMap2() {
-        // Creating a list of Prime Numbers
-        List&lt;Integer&gt; PrimeNumbers = Arrays.asList(5, 7, 11, 13);
+    <span style="color:#998;font-style:italic">/**
+</span><span style="color:#998;font-style:italic">     * 扁平化list---&gt;降维
+</span><span style="color:#998;font-style:italic">     * date:2019/12/19 12:32 PM
+</span><span style="color:#998;font-style:italic">     */</span>
+    <span style="color:#3c5d5d;font-weight:bold">@Test</span>
+    <span style="color:#000;font-weight:bold">public</span> <span style="color:#458;font-weight:bold">void</span> <span style="color:#900;font-weight:bold">testFlatMap2</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">{</span>
+        <span style="color:#998;font-style:italic">// Creating a list of Prime Numbers
+</span><span style="color:#998;font-style:italic"></span>        List<span style="color:#000;font-weight:bold">&lt;</span>Integer<span style="color:#000;font-weight:bold">&gt;</span> PrimeNumbers <span style="color:#000;font-weight:bold">=</span> Arrays<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">asList</span><span style="color:#000;font-weight:bold">(</span>5<span style="color:#000;font-weight:bold">,</span> 7<span style="color:#000;font-weight:bold">,</span> 11<span style="color:#000;font-weight:bold">,</span> 13<span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">;</span>
 
-        // Creating a list of Odd Numbers
-        List&lt;Integer&gt; OddNumbers = Arrays.asList(1, 3, 5);
+        <span style="color:#998;font-style:italic">// Creating a list of Odd Numbers
+</span><span style="color:#998;font-style:italic"></span>        List<span style="color:#000;font-weight:bold">&lt;</span>Integer<span style="color:#000;font-weight:bold">&gt;</span> OddNumbers <span style="color:#000;font-weight:bold">=</span> Arrays<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">asList</span><span style="color:#000;font-weight:bold">(</span>1<span style="color:#000;font-weight:bold">,</span> 3<span style="color:#000;font-weight:bold">,</span> 5<span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">;</span>
 
-        // Creating a list of Even Numbers
-        List&lt;Integer&gt; EvenNumbers = Arrays.asList(2, 4, 6, 8);
+        <span style="color:#998;font-style:italic">// Creating a list of Even Numbers
+</span><span style="color:#998;font-style:italic"></span>        List<span style="color:#000;font-weight:bold">&lt;</span>Integer<span style="color:#000;font-weight:bold">&gt;</span> EvenNumbers <span style="color:#000;font-weight:bold">=</span> Arrays<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">asList</span><span style="color:#000;font-weight:bold">(</span>2<span style="color:#000;font-weight:bold">,</span> 4<span style="color:#000;font-weight:bold">,</span> 6<span style="color:#000;font-weight:bold">,</span> 8<span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">;</span>
 
-        List&lt;List&lt;Integer&gt;&gt; listOfListofInts =
-                Arrays.asList(PrimeNumbers, OddNumbers, EvenNumbers);
-        // 相当于一个二维的数组[[5, 7, 11,13],[1, 3, 5],[2, 4, 6, 8]]
-        System.out.println(&quot;The Structure before flattening is : &quot; + listOfListofInts);
+        List<span style="color:#000;font-weight:bold">&lt;</span>List<span style="color:#000;font-weight:bold">&lt;</span>Integer<span style="color:#000;font-weight:bold">&gt;</span><span style="color:#000;font-weight:bold">&gt;</span> listOfListofInts <span style="color:#000;font-weight:bold">=</span>
+                Arrays<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">asList</span><span style="color:#000;font-weight:bold">(</span>PrimeNumbers<span style="color:#000;font-weight:bold">,</span> OddNumbers<span style="color:#000;font-weight:bold">,</span> EvenNumbers<span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">;</span>
+        <span style="color:#998;font-style:italic">// 相当于一个二维的数组[[5, 7, 11,13],[1, 3, 5],[2, 4, 6, 8]]
+</span><span style="color:#998;font-style:italic"></span>        System<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">out</span><span style="color:#000;font-weight:bold">.</span><span style="color:#008080">println</span><span style="color:#000;font-weight:bold">(</span><span style="color:#d14">&#34;The Structure before flattening is : &#34;</span> <span style="color:#000;font-weight:bold">+</span> listOfListofInts<span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">;</span>
 
-        // 降维
-        List&lt;Integer&gt; listofInts = listOfListofInts.stream()
-                .flatMap(list -&gt; list.stream())
-                .collect(Collectors.toList());
+        <span style="color:#998;font-style:italic">// 降维
+</span><span style="color:#998;font-style:italic"></span>        List<span style="color:#000;font-weight:bold">&lt;</span>Integer<span style="color:#000;font-weight:bold">&gt;</span> listofInts <span style="color:#000;font-weight:bold">=</span> listOfListofInts<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">stream</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span>
+                <span style="color:#000;font-weight:bold">.</span><span style="color:#008080">flatMap</span><span style="color:#000;font-weight:bold">(</span>list <span style="color:#000;font-weight:bold">-</span><span style="color:#000;font-weight:bold">&gt;</span> list<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">stream</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">)</span>
+                <span style="color:#000;font-weight:bold">.</span><span style="color:#008080">collect</span><span style="color:#000;font-weight:bold">(</span>Collectors<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">toList</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">;</span>
 
-        System.out.println(&quot;The Structure after flattening is : &quot; + listofInts);
-    }
+        System<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">out</span><span style="color:#000;font-weight:bold">.</span><span style="color:#008080">println</span><span style="color:#000;font-weight:bold">(</span><span style="color:#d14">&#34;The Structure after flattening is : &#34;</span> <span style="color:#000;font-weight:bold">+</span> listofInts<span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">;</span>
+    <span style="color:#000;font-weight:bold">}</span>
 
-    // 扁平化demo
-    static class Student {
-        String name;
-        List&lt;String&gt; foodList;
+    <span style="color:#998;font-style:italic">// 扁平化demo
+</span><span style="color:#998;font-style:italic"></span>    <span style="color:#000;font-weight:bold">static</span> <span style="color:#000;font-weight:bold">class</span> <span style="color:#458;font-weight:bold">Student</span> <span style="color:#000;font-weight:bold">{</span>
+        String name<span style="color:#000;font-weight:bold">;</span>
+        List<span style="color:#000;font-weight:bold">&lt;</span>String<span style="color:#000;font-weight:bold">&gt;</span> foodList<span style="color:#000;font-weight:bold">;</span>
 
-        public static void main(String[] args) {
-            // 随机生成20个学生数据,每个学生两个菜
-            final int nameNo = 0;
-            List&lt;Student&gt; students = Stream.generate(() -&gt; {
-                Student student = new Student();
-                student.name = &quot;学生&quot; + nameNo;
-                student.foodList = Lists.newArrayList(Constants.randName(), Constants.randName());
-                return student;
-            }).limit(20).collect(Collectors.toList());
+        <span style="color:#000;font-weight:bold">public</span> <span style="color:#000;font-weight:bold">static</span> <span style="color:#458;font-weight:bold">void</span> <span style="color:#900;font-weight:bold">main</span><span style="color:#000;font-weight:bold">(</span>String<span style="color:#000;font-weight:bold">[</span><span style="color:#000;font-weight:bold">]</span> args<span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">{</span>
+            <span style="color:#998;font-style:italic">// 随机生成20个学生数据,每个学生两个菜
+</span><span style="color:#998;font-style:italic"></span>            <span style="color:#000;font-weight:bold">final</span> <span style="color:#458;font-weight:bold">int</span> nameNo <span style="color:#000;font-weight:bold">=</span> 0<span style="color:#000;font-weight:bold">;</span>
+            List<span style="color:#000;font-weight:bold">&lt;</span>Student<span style="color:#000;font-weight:bold">&gt;</span> students <span style="color:#000;font-weight:bold">=</span> Stream<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">generate</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">-</span><span style="color:#000;font-weight:bold">&gt;</span> <span style="color:#000;font-weight:bold">{</span>
+                Student student <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">new</span> Student<span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">;</span>
+                student<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">name</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;学生&#34;</span> <span style="color:#000;font-weight:bold">+</span> nameNo<span style="color:#000;font-weight:bold">;</span>
+                student<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">foodList</span> <span style="color:#000;font-weight:bold">=</span> Lists<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">newArrayList</span><span style="color:#000;font-weight:bold">(</span>Constants<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">randName</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">,</span> Constants<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">randName</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">;</span>
+                <span style="color:#000;font-weight:bold">return</span> student<span style="color:#000;font-weight:bold">;</span>
+            <span style="color:#000;font-weight:bold">}</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">.</span><span style="color:#008080">limit</span><span style="color:#000;font-weight:bold">(</span>20<span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">.</span><span style="color:#008080">collect</span><span style="color:#000;font-weight:bold">(</span>Collectors<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">toList</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">;</span>
 
-            // 输出全班同学的所有菜
-            List&lt;String&gt; collect = students.stream().flatMap(x -&gt; x.foodList.stream()).distinct().collect(Collectors.toList());
-            System.out.println(collect);
-        }
-    }
-}
-</code></pre>
+            <span style="color:#998;font-style:italic">// 输出全班同学的所有菜
+</span><span style="color:#998;font-style:italic"></span>            List<span style="color:#000;font-weight:bold">&lt;</span>String<span style="color:#000;font-weight:bold">&gt;</span> collect <span style="color:#000;font-weight:bold">=</span> students<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">stream</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">.</span><span style="color:#008080">flatMap</span><span style="color:#000;font-weight:bold">(</span>x <span style="color:#000;font-weight:bold">-</span><span style="color:#000;font-weight:bold">&gt;</span> x<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">foodList</span><span style="color:#000;font-weight:bold">.</span><span style="color:#008080">stream</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">.</span><span style="color:#008080">distinct</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">.</span><span style="color:#008080">collect</span><span style="color:#000;font-weight:bold">(</span>Collectors<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">toList</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">;</span>
+            System<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">out</span><span style="color:#000;font-weight:bold">.</span><span style="color:#008080">println</span><span style="color:#000;font-weight:bold">(</span>collect<span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">;</span>
+        <span style="color:#000;font-weight:bold">}</span>
+    <span style="color:#000;font-weight:bold">}</span>
+<span style="color:#000;font-weight:bold">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="7惰性计算延迟计算">7.惰性计算(延迟计算)</h2>
+<p>java8实战中对Stream延迟计算的描述：</p>
+<blockquote>
+<p>Java 8的Stream以其延迟性而著称。它们被刻意设计成这样，即延迟操作，有其独特的原因: Stream就像是一个黑盒，它接收请求生成结果。当你向一个 Stream发起一系列的操作请求时，这 些请求只是被一一保存起来。只有当你向Stream发起一个终端操作时，才会实际地进行计算。这 种设计具有显著的优点，特别是你需要对Stream进行多个操作时(你有可能先要进行filter操 作，紧接着做一个map，最后进行一次终端操作reduce);这种方式下Stream只需要遍历一次， 不需要为每个操作遍历一次所有的元素。</p>
+</blockquote>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">    <span style="color:#998;font-style:italic">/**
+</span><span style="color:#998;font-style:italic">     * 测试是否是惰性计算
+</span><span style="color:#998;font-style:italic">     */</span>
+    <span style="color:#3c5d5d;font-weight:bold">@Test</span>
+    <span style="color:#000;font-weight:bold">public</span> <span style="color:#458;font-weight:bold">void</span> <span style="color:#900;font-weight:bold">testLazyCompute</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">{</span>
+        Stream<span style="color:#000;font-weight:bold">&lt;</span>Integer<span style="color:#000;font-weight:bold">&gt;</span> stream <span style="color:#000;font-weight:bold">=</span> Stream<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">of</span><span style="color:#000;font-weight:bold">(</span>1<span style="color:#000;font-weight:bold">,</span> 2<span style="color:#000;font-weight:bold">,</span> 3<span style="color:#000;font-weight:bold">,</span> 4<span style="color:#000;font-weight:bold">,</span> 5<span style="color:#000;font-weight:bold">,</span> 6<span style="color:#000;font-weight:bold">,</span> 7<span style="color:#000;font-weight:bold">,</span> 8<span style="color:#000;font-weight:bold">)</span>
+                <span style="color:#000;font-weight:bold">.</span><span style="color:#008080">filter</span><span style="color:#000;font-weight:bold">(</span>x <span style="color:#000;font-weight:bold">-</span><span style="color:#000;font-weight:bold">&gt;</span> <span style="color:#000;font-weight:bold">{</span>
+                    System<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">out</span><span style="color:#000;font-weight:bold">.</span><span style="color:#008080">println</span><span style="color:#000;font-weight:bold">(</span><span style="color:#d14">&#34;filter 1 start&#34;</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">;</span>
+                    <span style="color:#458;font-weight:bold">boolean</span> res <span style="color:#000;font-weight:bold">=</span> x <span style="color:#000;font-weight:bold">&gt;</span> 0<span style="color:#000;font-weight:bold">;</span>
+                    System<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">out</span><span style="color:#000;font-weight:bold">.</span><span style="color:#008080">println</span><span style="color:#000;font-weight:bold">(</span><span style="color:#d14">&#34;filter 1 end&#34;</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">;</span>
+                    <span style="color:#000;font-weight:bold">return</span> res<span style="color:#000;font-weight:bold">;</span>
+                <span style="color:#000;font-weight:bold">}</span><span style="color:#000;font-weight:bold">)</span>
+                <span style="color:#000;font-weight:bold">.</span><span style="color:#008080">filter</span><span style="color:#000;font-weight:bold">(</span>x <span style="color:#000;font-weight:bold">-</span><span style="color:#000;font-weight:bold">&gt;</span> <span style="color:#000;font-weight:bold">{</span>
+                    System<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">out</span><span style="color:#000;font-weight:bold">.</span><span style="color:#008080">println</span><span style="color:#000;font-weight:bold">(</span><span style="color:#d14">&#34;filter 2 start&#34;</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">;</span>
+                    <span style="color:#458;font-weight:bold">boolean</span> res <span style="color:#000;font-weight:bold">=</span> x <span style="color:#000;font-weight:bold">%</span> 2<span style="color:#000;font-weight:bold">=</span><span style="color:#000;font-weight:bold">=</span>0<span style="color:#000;font-weight:bold">;</span>
+                    System<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">out</span><span style="color:#000;font-weight:bold">.</span><span style="color:#008080">println</span><span style="color:#000;font-weight:bold">(</span><span style="color:#d14">&#34;filter 2 end&#34;</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">;</span>
+                    <span style="color:#000;font-weight:bold">return</span> res<span style="color:#000;font-weight:bold">;</span>
+                <span style="color:#000;font-weight:bold">}</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">;</span>
+        <span style="color:#998;font-style:italic">// 不会执行filter函数
+</span><span style="color:#998;font-style:italic"></span>        System<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">out</span><span style="color:#000;font-weight:bold">.</span><span style="color:#008080">println</span><span style="color:#000;font-weight:bold">(</span>stream<span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">;</span>
+        <span style="color:#998;font-style:italic">// 会执行filter函数,但是因为findFirst,所以不会遍历全部元素
+</span><span style="color:#998;font-style:italic"></span>        Integer integer <span style="color:#000;font-weight:bold">=</span> stream<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">findFirst</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">.</span><span style="color:#008080">get</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">;</span>
+        System<span style="color:#000;font-weight:bold">.</span><span style="color:#008080">out</span><span style="color:#000;font-weight:bold">.</span><span style="color:#008080">println</span><span style="color:#000;font-weight:bold">(</span>integer<span style="color:#000;font-weight:bold">)</span><span style="color:#000;font-weight:bold">;</span>
 
-<h2 id="7-惰性计算-延迟计算">7.惰性计算(延迟计算)</h2>
-
-<p>java8实战中对Stream延迟计算的描述：
-&gt; Java 8的Stream以其延迟性而著称。它们被刻意设计成这样，即延迟操作，有其独特的原因: Stream就像是一个黑盒，它接收请求生成结果。当你向一个 Stream发起一系列的操作请求时，这 些请求只是被一一保存起来。只有当你向Stream发起一个终端操作时，才会实际地进行计算。这 种设计具有显著的优点，特别是你需要对Stream进行多个操作时(你有可能先要进行filter操 作，紧接着做一个map，最后进行一次终端操作reduce);这种方式下Stream只需要遍历一次， 不需要为每个操作遍历一次所有的元素。</p>
-
-<pre><code class="language-java">    /**
-     * 测试是否是惰性计算
-     */
-    @Test
-    public void testLazyCompute() {
-        Stream&lt;Integer&gt; stream = Stream.of(1, 2, 3, 4, 5, 6, 7, 8)
-                .filter(x -&gt; {
-                    System.out.println(&quot;filter 1 start&quot;);
-                    boolean res = x &gt; 0;
-                    System.out.println(&quot;filter 1 end&quot;);
-                    return res;
-                })
-                .filter(x -&gt; {
-                    System.out.println(&quot;filter 2 start&quot;);
-                    boolean res = x % 2==0;
-                    System.out.println(&quot;filter 2 end&quot;);
-                    return res;
-                });
-        // 不会执行filter函数
-        System.out.println(stream);
-        // 会执行filter函数,但是因为findFirst,所以不会遍历全部元素
-        Integer integer = stream.findFirst().get();
-        System.out.println(integer);
-
-    }
-</code></pre>
-
-<p>输出的结果是：</p>
-
+    <span style="color:#000;font-weight:bold">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>输出的结果是：</p>
 <pre><code>java.util.stream.ReferencePipeline$2@5d5eef3d
 filter 1 start,param is:1
 filter 1 end
@@ -460,14 +686,9 @@ filter 1 end
 filter 2 start,param is:2
 filter 2 end
 2
-</code></pre>
-
-<p>可见在一次遍历中执行两个filter函数，然后当遍历到第二个元素时，已经取得满足条件的一个元素，所以停止遍历，返回结果。</p>
-
+</code></pre><p>可见在一次遍历中执行两个filter函数，然后当遍历到第二个元素时，已经取得满足条件的一个元素，所以停止遍历，返回结果。</p>
 <p>惰性计算的原理其实就是把一系列“行为”暂存到内存中，在执行终结操作时才将这些行为施加上去，当条件满足即结束操作返回结果。相较于多次遍历的重复计算，惰性计算必然是提高了效率，但是暂存了行为，无疑是一种“空间换时间”的策略使用。</p>
-
 <h2 id="reference">reference</h2>
-
 <p>[1] Java 8实战
 [2] 趣学Haskell
 [3] <a href="https://www.geeksforgeeks.org/stream-flatmap-java-examples/">Stream flatMap() in Java with examples</a>
@@ -597,7 +818,6 @@ filter 2 end
         
     </div>
 </footer>
-
 
 
 
